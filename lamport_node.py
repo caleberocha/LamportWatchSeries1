@@ -36,7 +36,7 @@ class LamportNode:
             else:
                 # remote
                 idx, node = self.get_node()
-                self.send_message(idx)
+                self.send_message(idx, node)
 
         conn_listener.stop()
 

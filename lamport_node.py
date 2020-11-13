@@ -1,9 +1,10 @@
 from time import sleep, perf_counter_ns
 import random
 import constants
-from errors import InvalidNodeError
+from errors import InvalidNodeError, SocketTimeout
 from listener import Listener
 from clock import Clock
+from network import create_socket, bind_random_port, wait_response
 
 
 class LamportNode:
@@ -15,7 +16,7 @@ class LamportNode:
 
         try:
             self.host = nodes[index]["host"]
-            self.port = nodes[index]["port"]
+            self.port = int(nodes[index]["port"])
             self.chance = float(nodes[index]["chance"])
         except KeyError:
             raise InvalidNodeError(f"Invalid node {index}")
@@ -36,13 +37,24 @@ class LamportNode:
             else:
                 # remote
                 idx, node = self.get_node()
-                self.send_message(idx, node)
+                try:
+                    self.send_message(idx, node)
+                except SocketTimeout:
+                    print(f"""Error: Timeout sending message to {node["host"]}:{node["port"]}""")
+                    break
 
         conn_listener.stop()
 
     def send_message(self, index, node):
-        # TODO send message
-        print(f"""{self.get_time()} {self.index} {self.clock.get()} s {index}""")
+        node_addr = (node["host"], node["port"])
+        clock = self.clock.get()
+        sock = create_socket()
+        callback_port = bind_random_port(sock)
+
+        sock.sendto(f"{self.index} {clock} {self.host} {callback_port}".encode("utf-8"), node_addr)
+        wait_response(sock, node_addr, 3.0)
+
+        print(f"""{self.get_time()} {self.index} {clock} s {index}""")
 
     def get_node(self):
         index = random.choice(list(self.nodes.keys()))

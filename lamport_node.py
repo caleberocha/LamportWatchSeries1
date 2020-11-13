@@ -40,7 +40,9 @@ class LamportNode:
                 try:
                     self.send_message(idx, node)
                 except SocketTimeout:
-                    print(f"""Error: Timeout sending message to {node["host"]}:{node["port"]}""")
+                    print(
+                        f"""Error: Timeout sending message to node {idx} ({node["host"]}:{node["port"]})"""
+                    )
                     break
 
         conn_listener.stop()
@@ -51,9 +53,12 @@ class LamportNode:
         sock = create_socket()
         callback_port = bind_random_port(sock)
 
-        sock.sendto(f"{self.index} {clock} {self.host} {callback_port}".encode("utf-8"), node_addr)
+        sock.sendto(
+            f"{self.index} {clock} {self.host} {callback_port}".encode("utf-8"),
+            node_addr,
+        )
         wait_response(sock, node_addr, 3.0)
-        
+
         sock.close()
 
         print(f"""{self.get_time()} {self.index} {clock} s {index}""")

@@ -31,6 +31,9 @@ class Listener(Thread):
                 )
             except socket.timeout:
                 pass
+        
+        self.socket.close()
+
 
     def stop(self):
         self.running = False

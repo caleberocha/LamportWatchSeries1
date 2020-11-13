@@ -53,6 +53,8 @@ class LamportNode:
 
         sock.sendto(f"{self.index} {clock} {self.host} {callback_port}".encode("utf-8"), node_addr)
         wait_response(sock, node_addr, 3.0)
+        
+        sock.close()
 
         print(f"""{self.get_time()} {self.index} {clock} s {index}""")
 

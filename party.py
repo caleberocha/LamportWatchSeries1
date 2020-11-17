@@ -1,6 +1,7 @@
 import socket
 import pickle
 from threading import Thread
+from shutil import get_terminal_size
 from network import create_multicast_socket, create_multicast_socket_for_send
 import constants
 
@@ -41,7 +42,8 @@ class Party(Thread):
                     end="",
                 )
 
-        print(" " * 40, end="\r")
+        cols = get_terminal_size((80, 20))[0]
+        print("\r" + " " * cols, end="\r")
 
     def add_node(self, id_node, addr):
         self.nodes[id_node] = ":".join([str(n) for n in addr])

@@ -21,22 +21,16 @@ class Listener(Thread):
                 node, clock, callback_host, callback_port = data.decode("utf-8").split(
                     " "
                 )
-                self.socket.sendto(
-                    b"RECEIVED", (callback_host, int(callback_port))
-                )
+                self.socket.sendto(b"RECEIVED", (callback_host, int(callback_port)))
 
                 self.shared_clock.set(max(self.shared_clock.get(), int(clock)) + 1)
                 print(
-                    f"""{self.get_time()} {self.index} {self.shared_clock.get()} r {node} {clock}"""
+                    f"""{perf_counter_ns() // 1000} {self.index} {self.shared_clock.get()} r {node} {clock}"""
                 )
             except socket.timeout:
                 pass
-        
-        self.socket.close()
 
+        self.socket.close()
 
     def stop(self):
         self.running = False
-
-    def get_time(self):
-        return perf_counter_ns() // 1000

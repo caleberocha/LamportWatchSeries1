@@ -12,7 +12,7 @@ class LamportNode:
         self.clock = Clock()
 
         self.index = index
-        self.nodes = nodes
+        self.nodes = {i: n for i, n in nodes.items()}
 
         try:
             self.host = nodes[index]["host"]
@@ -24,16 +24,22 @@ class LamportNode:
         # Removes own node from the list to avoid sending messages to itself
         self.nodes.pop(self.index, None)
 
+        self.running = False
+
     def start(self):
+        self.running = True
         conn_listener = Listener(self.index, self.port, self.clock)
         conn_listener.start()
 
         for i in range(constants.EVENTS_COUNT):
+            if not self.running:
+                break
+
             sleep(min(random.random() + 0.5, 1))
             self.clock.increment()
             if random.random() <= self.chance:
                 # local
-                print(f"{self.get_time()} {self.index} {self.clock.get()} l")
+                print(f"{perf_counter_ns() // 1000} {self.index} {self.clock.get()} l")
             else:
                 # remote
                 idx, node = self.get_node()
@@ -61,11 +67,11 @@ class LamportNode:
 
         sock.close()
 
-        print(f"""{self.get_time()} {self.index} {clock} s {index}""")
+        print(f"""{perf_counter_ns() // 1000} {self.index} {clock} s {index}""")
 
     def get_node(self):
         index = random.choice(list(self.nodes.keys()))
         return index, self.nodes[index]
 
-    def get_time(self):
-        return perf_counter_ns() // 1000
+    def stop(self):
+        self.running = False

@@ -1,13 +1,26 @@
 import sys
+from time import sleep
 from lamport_node import LamportNode
+from party import Party
 from config_parser import parse_config
 from errors import InvalidNodeError
 
 
 def lamport(config_file, node_index):
     nodes = parse_config(config_file)
+
     node = LamportNode(nodes, node_index)
-    node.start()
+    party = Party(len(nodes))
+    try:
+        party.start()
+        party.enter(node_index)
+        while party.is_alive():
+            sleep(0.1)
+
+        node.start()
+    except KeyboardInterrupt:
+        party.stop()
+        node.stop()
 
 
 if __name__ == "__main__":

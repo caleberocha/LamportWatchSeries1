@@ -1,7 +1,9 @@
 import socket
+import struct
 import errno
 import random
 from time import perf_counter
+import constants
 from errors import SocketError, SocketTimeout
 
 
@@ -10,6 +12,27 @@ def create_socket(timeout=None, bind_port=None):
     if bind_port is not None:
         sock.bind(("127.0.0.1", bind_port))
     sock.settimeout(timeout)
+
+    return sock
+
+
+def create_multicast_socket(timeout=None):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.bind((constants.MCAST_GROUP, constants.MCAST_PORT))
+    sock.setsockopt(
+        socket.IPPROTO_IP,
+        socket.IP_ADD_MEMBERSHIP,
+        struct.pack("4sl", socket.inet_aton(constants.MCAST_GROUP), socket.INADDR_ANY),
+    )
+    sock.settimeout(timeout)
+
+    return sock
+
+
+def create_multicast_socket_for_send():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, constants.MCAST_TTL)
 
     return sock
 

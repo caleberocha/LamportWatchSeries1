@@ -6,4 +6,4 @@ Python 3.6+
 
 ## Uso
 
-    python run.py
+    python run.py [arquivo_configuracao] [id_nodo]

@@ -5,6 +5,7 @@ from errors import InvalidNodeError, SocketTimeout
 from listener import Listener
 from clock import Clock
 from network import create_socket, bind_random_port, wait_response
+from logger import setup_logger
 
 
 class LamportNode:
@@ -26,6 +27,8 @@ class LamportNode:
 
         self.running = False
 
+        self.logger = setup_logger(self.index)
+
     def start(self):
         self.running = True
         conn_listener = Listener(self.index, self.port, self.clock)
@@ -39,7 +42,7 @@ class LamportNode:
             self.clock.increment()
             if random.random() <= self.chance:
                 # local
-                print(f"{perf_counter_ns() // 1000} {self.index} {self.clock.get()} l")
+                self.logger.info(f"{perf_counter_ns() // 1000} {self.index} {self.clock.get()}{self.index} l")
             else:
                 # remote
                 idx, node = self.get_node()
@@ -67,7 +70,7 @@ class LamportNode:
 
         sock.close()
 
-        print(f"""{perf_counter_ns() // 1000} {self.index} {clock} s {index}""")
+        self.logger.info(f"""{perf_counter_ns() // 1000} {self.index} {clock}{self.index} s {index}""")
 
     def get_node(self):
         index = random.choice(list(self.nodes.keys()))

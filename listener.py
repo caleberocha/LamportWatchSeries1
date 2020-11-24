@@ -2,6 +2,7 @@ from threading import Thread
 import socket
 from time import perf_counter_ns
 from network import create_socket
+from logger import setup_logger
 
 
 class Listener(Thread):
@@ -12,6 +13,8 @@ class Listener(Thread):
         self.shared_clock = shared_clock
         self.running = False
         self.socket = create_socket(1.0, self.port)
+
+        self.logger = setup_logger(self.index)
 
     def run(self):
         self.running = True
@@ -24,8 +27,8 @@ class Listener(Thread):
                 self.socket.sendto(b"RECEIVED", (callback_host, int(callback_port)))
 
                 self.shared_clock.set(max(self.shared_clock.get(), int(clock)) + 1)
-                print(
-                    f"""{perf_counter_ns() // 1000} {self.index} {self.shared_clock.get()} r {node} {clock}"""
+                self.logger.info(
+                    f"""{perf_counter_ns() // 1000} {self.index} {self.shared_clock.get()}{node} r {node} {clock}{node}"""
                 )
             except socket.timeout:
                 pass

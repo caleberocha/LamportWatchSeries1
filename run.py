@@ -3,11 +3,14 @@ from time import sleep
 from lamport_node import LamportNode
 from party import Party
 from config_parser import parse_config
+from logger import clean_log
 from errors import InvalidNodeError
 
 
 def lamport(config_file, node_index):
     nodes = parse_config(config_file)
+
+    clean_log(node_index)
 
     node = LamportNode(nodes, node_index)
     party = Party(len(nodes))

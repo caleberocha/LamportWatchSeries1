@@ -10,7 +10,7 @@ from errors import SocketError, SocketTimeout
 def create_socket(timeout=None, bind_port=None):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     if bind_port is not None:
-        sock.bind(("127.0.0.1", bind_port))
+        sock.bind(("0.0.0.0", bind_port))
     sock.settimeout(timeout)
 
     return sock
@@ -41,7 +41,7 @@ def bind_random_port(sock):
     while True:
         port = random.randint(10000, 65535)
         try:
-            sock.bind(("127.0.0.1", port))
+            sock.bind(("0.0.0.0", port))
             return port
         except socket.error as e:
             if not e.errno == errno.EADDRINUSE:

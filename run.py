@@ -4,6 +4,7 @@ from lamport_node import LamportNode
 from party import Party
 from config_parser import parse_config
 from logger import clean_log
+from log_api import upload_log
 from errors import InvalidNodeError
 
 
@@ -21,6 +22,11 @@ def lamport(config_file, node_index):
             sleep(0.1)
 
         node.start()
+
+        print("Uploading log")
+        upload_log(node_index)
+        print("FIN")
+
     except KeyboardInterrupt:
         party.stop()
         node.stop()

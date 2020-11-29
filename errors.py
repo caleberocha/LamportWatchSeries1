@@ -8,3 +8,11 @@ class SocketError(Exception):
 
 class SocketTimeout(Exception):
     pass
+
+
+class UploadError(Exception):
+    pass
+
+
+class DownloadError(Exception):
+    pass

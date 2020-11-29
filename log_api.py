@@ -13,9 +13,6 @@ def upload_log(node_idx):
     ) as f:
         log = f.read()
 
-    # if log == "":
-    #     raise Exception("Nothing to upload")
-
     url_to_parse = f"{constants.LOG_UPLOAD_URL}{node_idx}"
 
     try:
@@ -25,7 +22,7 @@ def upload_log(node_idx):
 
     conn = connclass(domain)
     payload = f"text={log}"
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    headers = {"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"}
 
     try:
         conn.request("POST", url, payload, headers)

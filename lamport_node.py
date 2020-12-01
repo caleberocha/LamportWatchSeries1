@@ -40,7 +40,7 @@ class LamportNode:
 
             sleep(min(random.random() + 0.5, 1))
             self.clock.increment()
-            if random.random() <= self.chance:
+            if random.random() > self.chance:
                 # local
                 self.logger.info(f"{perf_counter_ns() // 1000} {self.index} {self.clock.get()}{self.index} l")
             else:
